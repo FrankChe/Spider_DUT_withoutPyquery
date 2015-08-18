@@ -61,15 +61,13 @@ class DUT:
         #获得本学期成绩(软件工程)
         self.gradeUrl = 'http://202.118.65.21:8089/gradeLnAllAction.do?type=ln&oper=fainfo&fajhh=4242'
         page = self.getPage()
-        #print page
 
-        d = pq(page)
-        #print d
-        p = d('.odd')
+        pattern = re.compile(r'<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align.*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<p.*?>(.*?)&nbsp;')
+        p = pattern.findall(page)
 
         for i in p:
-            self.credit.append(float(pq(i).find('td').eq(4).text()))
-            self.grades.append(float(pq(i).find('td p').eq(0).text().encode("utf-8")))
+            self.credit.append(float("".join(i[0].split())))
+            self.grades.append(float("".join(i[2].split())))
 
     def getGrades_required(self,type):
         #获得本学期必修课成绩
@@ -80,13 +78,15 @@ class DUT:
         page = self.getPage()
         credit = []
         grades = []
-        d = pq(page)
-        p = d('.odd')
+        #using regular expression
+        pattern = re.compile(r'<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align.*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<p.*?>(.*?)&nbsp;')
+        p = pattern.findall(page)
 
         for i in p:
-            if pq(i).find('td').eq(5).text().strip() == '必修':
-                credit.append(float(pq(i).find('td').eq(4).text()))
-                grades.append(float(pq(i).find('td p').eq(0).text().encode("utf-8")))
+            t = "".join(i[1].split())
+            if t == '必修':
+                credit.append(float("".join(i[0].split())))
+                grades.append(float("".join(i[2].split())))
         return credit,grades
 
 
@@ -94,14 +94,15 @@ class DUT:
         #获得本学期成绩(网络工程)
         self.gradeUrl = 'http://202.118.65.21:8089/gradeLnAllAction.do?type=ln&oper=fainfo&fajhh=4243'
         page = self.getPage()
-        #print page
-        d = pq(page)
-        p = d('.odd')
+
+        pattern = re.compile(r'<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align.*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<p.*?>(.*?)&nbsp;')
+        p = pattern.findall(page)
+
         for i in p:
-            if pq(i).find('td').eq(6).text().strip() == "通过":
+            if "".join(i[2].split()) == "通过":
                 continue
-            self.credit.append(float(pq(i).find('td').eq(4).text()))
-            self.grades.append(float(pq(i).find('td').eq(6).text()))
+            self.credit.append(float("".join(i[0].split())))
+            self.grades.append(float("".join(i[2].split())))
         return self.credit,self.grades
 
 
@@ -129,8 +130,6 @@ class DUT:
         print "你的GPA为(标准算法)：",sum*4/(weight*100)
         print "你的必修课平均成绩为：",sum_re/weight_re
         print "你的必修课GPA为(标准算法)：",sum_re*4/(weight_re*100)
-
-
 
 
 
