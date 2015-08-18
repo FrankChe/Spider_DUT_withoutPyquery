@@ -9,7 +9,7 @@ import urllib
 import urllib2
 import cookielib
 import re
-from pyquery import PyQuery as pq
+#from pyquery import PyQuery as pq
 import getpass
 import time
 #DUT计算绩点
@@ -37,6 +37,9 @@ class DUT:
         self.credit = []
         self.grades = []
 
+        #课程list
+        self.course = []
+        self.ty = []
 
 
     #获取本学期成绩页面
@@ -62,12 +65,17 @@ class DUT:
         self.gradeUrl = 'http://202.118.65.21:8089/gradeLnAllAction.do?type=ln&oper=fainfo&fajhh=4242'
         page = self.getPage()
 
-        pattern = re.compile(r'<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align.*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<p.*?>(.*?)&nbsp;')
+        pattern = re.compile(r'<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<td align.*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<p.*?>(.*?)&nbsp;')
         p = pattern.findall(page)
 
         for i in p:
-            self.credit.append(float("".join(i[0].split())))
-            self.grades.append(float("".join(i[2].split())))
+            self.credit.append(float("".join(i[1].split())))
+            self.grades.append(float("".join(i[3].split())))
+            self.course.append("".join(i[0].split()))
+            self.ty.append("".join(i[2].split()))
+        print "所有课程及成绩："
+        for i in range(len(self.course)):
+            print self.course[i],self.ty[i],self.grades[i],self.credit[i]
 
     def getGrades_required(self,type):
         #获得本学期必修课成绩
@@ -79,14 +87,14 @@ class DUT:
         credit = []
         grades = []
         #using regular expression
-        pattern = re.compile(r'<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align.*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<p.*?>(.*?)&nbsp;')
+        pattern = re.compile(r'<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<td align.*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<p.*?>(.*?)&nbsp;')
         p = pattern.findall(page)
 
         for i in p:
-            t = "".join(i[1].split())
+            t = "".join(i[2].split())
             if t == '必修':
-                credit.append(float("".join(i[0].split())))
-                grades.append(float("".join(i[2].split())))
+                credit.append(float("".join(i[1].split())))
+                grades.append(float("".join(i[3].split())))
         return credit,grades
 
 
@@ -95,14 +103,14 @@ class DUT:
         self.gradeUrl = 'http://202.118.65.21:8089/gradeLnAllAction.do?type=ln&oper=fainfo&fajhh=4243'
         page = self.getPage()
 
-        pattern = re.compile(r'<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?<td align.*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<p.*?>(.*?)&nbsp;')
+        pattern = re.compile(r'<td align[\s\S]*?<td align[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<td align.*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?>([\s\S]*?)</td>[\s\S]*?<td align[\s\S]*?<p.*?>(.*?)&nbsp;')
         p = pattern.findall(page)
 
         for i in p:
             if "".join(i[2].split()) == "通过":
                 continue
-            self.credit.append(float("".join(i[0].split())))
-            self.grades.append(float("".join(i[2].split())))
+            self.credit.append(float("".join(i[1].split())))
+            self.grades.append(float("".join(i[3].split())))
         return self.credit,self.grades
 
 
