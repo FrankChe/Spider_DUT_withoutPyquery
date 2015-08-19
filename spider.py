@@ -107,11 +107,16 @@ class DUT:
         p = pattern.findall(page)
 
         for i in p:
-            if "".join(i[2].split()) == "通过":
+            if "".join(i[3].split()) == "通过":
                 continue
             self.credit.append(float("".join(i[1].split())))
             self.grades.append(float("".join(i[3].split())))
-        return self.credit,self.grades
+            self.course.append("".join(i[0].split()))
+            self.ty.append("".join(i[2].split()))
+        print "所有课程及成绩："
+        for i in range(len(self.course)):
+            print self.course[i],self.ty[i],self.grades[i],self.credit[i]
+
 
 
     def getGrade(self,type):
@@ -139,19 +144,57 @@ class DUT:
         print "你的必修课平均成绩为：",sum_re/weight_re
         print "你的必修课GPA为(标准算法)：",sum_re*4/(weight_re*100)
 
+    def getGrade_delete(self):
+        course_del = raw_input("请输入要删除的课程  (输入q结束输入)")
+        while course_del != 'q':
+            if course_del not in self.course:
+                print "没有该课程"
+                course_del = raw_input("请输入要删除的课程  (输入q结束输入)")
+            else:
+                p = self.course.index(course_del)
+                self.course.remove(course_del)
+                self.credit.remove(self.credit[p])
+                self.grades.remove(self.grades[p])
+                course_del = raw_input("请输入要删除的课程  (输入q结束输入)")
+
+        print "删除后的课程列表及成绩为："
+        for i in range(len(self.course)):
+            print self.course[i],self.ty[i],self.grades[i],self.credit[i]
+
+        sum = 0.0
+        weight = 0.0
+        for i in range(len(self.credit)):
+            sum += self.credit[i] * self.grades[i]
+            weight += self.credit[i]
+        print "你的平均成绩为：(删除指定课程删除指定课程后)",sum/weight
+        print "你的GPA为(标准算法)：(删除指定课程后)",sum*4/(weight*100)
+        print " "
 
 
-print "请输入学号和密码："
-username = raw_input()
-password = getpass.getpass()
-type = raw_input("请输入你的专业类型： 1. 软件工程   2. 网络工程") #用以区分专业类型
-if type != '1' and type != '2':
-    print "输入非法，即将退出程序..."
-    time.sleep(2)
-    exit(1)
 
-try:
-    dut = DUT(username,password)
-    dut.getGrade(type)
-except:
-    print "失败！"
+while True:
+    print "请输入学号和密码：(输入“q”退出)"
+    username = raw_input()
+    if username == 'q':
+        exit(0)
+    password = getpass.getpass()
+    type = raw_input("请输入你的专业类型： 1. 软件工程   2. 网络工程") #用以区分专业类型
+    if type != '1' and type != '2':
+        print "输入非法，即将退出程序..."
+        time.sleep(2)
+        exit(1)
+
+    try:
+        dut = DUT(username,password)
+        dut.getGrade(type)
+        op = raw_input("要删除几门课程进行计算吗？ Y/N")
+        if op == 'Y' or op == 'y':
+            dut.getGrade_delete()
+        elif op == 'N' or op == 'n':
+            print "查询结束\n"
+        else:
+            print "输入非法\n"
+
+
+    except:
+        print "失败！"
