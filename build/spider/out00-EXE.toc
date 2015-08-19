@@ -1,0 +1,9 @@
+('/Users/chexiaoyu/Spider_DUT_withoutPyquery/dist/spider',
+ True,
+ False,
+ None,
+ None,
+ [],
+ None,
+ False,
+ 1439961898)
