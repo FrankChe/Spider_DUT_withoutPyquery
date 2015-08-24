@@ -15,3 +15,6 @@ exe = EXE(pyz,
           strip=None,
           upx=True,
           console=True )
+app = BUNDLE(exe,
+			 a.datas,
+			 name='Spider.app')

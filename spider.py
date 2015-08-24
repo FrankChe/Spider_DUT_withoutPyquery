@@ -12,6 +12,8 @@ import re
 #from pyquery import PyQuery as pq
 import getpass
 import time
+import xlwt
+
 #DUT计算绩点
 
 
@@ -171,6 +173,22 @@ class DUT:
         print " "
 
 
+    def write_file(self):
+        wb = xlwt.Workbook()
+        ws = wb.add_sheet('course')
+        ws.write(0,0,'课程名'.decode('utf-8'))
+        ws.write(0,1,'类型'.decode('utf-8'))
+        ws.write(0,2,'学分'.decode('utf-8'))
+        ws.write(0,3,'成绩'.decode('utf-8'))
+
+        for i in range(len(self.course)):
+            ws.write(i+1,0,self.course[i])
+            ws.write(i+1,1,self.ty[i])
+            ws.write(i+1,2,self.credit[i])
+            ws.write(i+1,3,self.grades[i])
+        wb.save('course.xls')
+
+
 
 while True:
     print "请输入学号和密码：(输入“q”退出)"
@@ -187,6 +205,11 @@ while True:
     try:
         dut = DUT(username,password)
         dut.getGrade(type)
+        op = raw_input("要将课程信息写入Excel表格吗？Y/N")
+        if op == 'Y' or op == 'y':
+            dut.write_file()
+        else:
+            continue
         op = raw_input("要删除几门课程进行计算吗？ Y/N")
         if op == 'Y' or op == 'y':
             dut.getGrade_delete()
